@@ -68,5 +68,21 @@ utilities.parseRequest = (req) => {
   return requestedProperties;
 };
 
+utilities.generateToken = (strLength) => {
+  const possibleCharacters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()";
+  strLength =
+    typeof strLength === "number" && strLength > 0 ? strLength : false;
+  if (strLength) {
+    let token = "";
+    for (let i = 0; i < strLength; i++) {
+      token += possibleCharacters.charAt(
+        Math.floor(Math.random() * possibleCharacters.length)
+      );
+    }
+    return token;
+  }
+};
+
 //export module
 module.exports = utilities;
