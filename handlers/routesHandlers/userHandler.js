@@ -1,8 +1,11 @@
 //dependecies
 const { hashPassword } = require("../../helpers/utilities");
 const data = require("../../lib/data");
-
+const { _token } = require("./tokenHandler");
 const { methodValidator } = require("../methodHandlers/methodValidator");
+
+//destructuring veriFyToken function from _token
+const { verifyToken } = _token;
 
 //module scaffolding
 const handler = {};
@@ -71,22 +74,37 @@ handler._user.post = (requestedProperties, callback) => {
     });
   }
 };
+//Authenticated with token
 handler._user.get = (requestedProperties, callback) => {
   const { queryStringObject } = requestedProperties;
   const { email } = queryStringObject;
   if (email) {
-    data.read("users", email, (err, userData) => {
-      if (!err && userData) {
-        delete userData.password;
-        callback(200, userData);
-      } else {
-        callback(404, { message: "User not found" });
-      }
-    });
+    let token =
+      typeof requestedProperties.headersObject.token === "string"
+        ? requestedProperties.headersObject.token
+        : false;
+
+    if (token) {
+      verifyToken(token, email, (tokenIsValid) => {
+        if (tokenIsValid) {
+          data.read("users", email, (err, userData) => {
+            if (!err && userData) {
+              delete userData.password;
+              callback(200, userData);
+            } else {
+              callback(404, { message: "User not found" });
+            }
+          });
+        } else {
+          callback(403, { message: "Forbidden" });
+        }
+      });
+    }
   } else {
     callback(400, { message: "Missing required fields" });
   }
 };
+//Authenticated with token
 handler._user.put = (requestedProperties, callback) => {
   const { payload } = requestedProperties;
   const { email, firstName, lastName, password } = payload;
@@ -112,19 +130,31 @@ handler._user.put = (requestedProperties, callback) => {
     //check if the user already exists in the database
     data.read("users", userEmail, (err, userData) => {
       if (!err && userData) {
-        const userObject = {
-          firstName: userFirstName || userData.firstName,
-          lastName: userLastName || userData.lastName,
-          password: hashPassword(userPassword) || userData.password,
-        };
-        //update the user
-        data.update("users", userEmail, userObject, (err) => {
-          if (!err) {
-            callback(200, { message: "User updated successfully" });
-          } else {
-            callback(500, { message: `${err}` });
-          }
-        });
+        let token =
+          typeof requestedProperties.headersObject.token === "string"
+            ? requestedProperties.headersObject.token
+            : false;
+
+        if (token) {
+          verifyToken(token, email, (tokenIsValid) => {
+            if (tokenIsValid) {
+              const userObject = {
+                firstName: userFirstName || userData.firstName,
+                lastName: userLastName || userData.lastName,
+                password: hashPassword(userPassword) || userData.password,
+                email: userEmail || userData.email,
+              };
+              //update the user
+              data.update("users", userEmail, userObject, (err) => {
+                if (!err) {
+                  callback(200, { message: "User updated successfully" });
+                } else {
+                  callback(500, { message: `${err}` });
+                }
+              });
+            }
+          });
+        }
       } else {
         callback(404, { message: "User not found" });
       }
@@ -133,19 +163,31 @@ handler._user.put = (requestedProperties, callback) => {
     callback(400, { message: "Missing required fields" });
   }
 };
+//Authenticated with token
 handler._user.delete = (requestedProperties, callback) => {
   const { queryStringObject } = requestedProperties;
   const { email } = queryStringObject;
   if (email) {
     data.read("users", email, (err, userData) => {
       if (!err && userData) {
-        data.delete("users", email, (err) => {
-          if (!err) {
-            callback(200, { message: "User deleted successfully" });
-          } else {
-            callback(500, { message: `${err}` });
-          }
-        });
+        let token =
+          typeof requestedProperties.headersObject.token === "string"
+            ? requestedProperties.headersObject.token
+            : false;
+
+        if (token) {
+          verifyToken(token, email, (tokenIsValid) => {
+            if (tokenIsValid) {
+              data.delete("users", email, (err) => {
+                if (!err) {
+                  callback(200, { message: "User deleted successfully" });
+                } else {
+                  callback(500, { message: `${err}` });
+                }
+              });
+            }
+          });
+        }
       } else {
         callback(404, { message: "User not found" });
       }

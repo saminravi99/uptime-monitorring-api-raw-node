@@ -160,6 +160,20 @@ handler._token.delete = (requestedProperties, callback) => {
     callback(400, { message: "Missing required fields" });
   }
 };
+//normal function to verify token
+handler._token.verifyToken = (token, email, callback) => {
+  data.read("tokens", token, (err, tokenData) => {
+    if (!err && tokenData) {
+      if (tokenData.email === email && tokenData.expTime > Date.now()) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    } else {
+      callback(false);
+    }
+  });
+};
 
 //export module
 module.exports = handler;
