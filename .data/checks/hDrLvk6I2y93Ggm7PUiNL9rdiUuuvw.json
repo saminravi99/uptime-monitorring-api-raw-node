@@ -1,0 +1,9 @@
+{
+  "protocol": "https",
+  "url": "programming-hero.com",
+  "email": "sagalpriam@gmail.com",
+  "method": "GET",
+  "successCodes": [200, 201, 404],
+  "timeoutSeconds": 3,
+  "id": "hDrLvk6I2y93Ggm7PUiNL9rdiUuuvw"
+}

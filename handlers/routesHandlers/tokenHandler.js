@@ -53,7 +53,10 @@ handler._token.post = (requestedProperties, callback) => {
           //create a new token
           data.create("tokens", token, tokenObject, (err) => {
             if (!err) {
-              callback(200, { message: "Token created successfully" });
+              callback(200, {
+                message: "Token created successfully",
+                tokenObject,
+              });
             } else {
               callback(500, { message: `${err}` });
             }

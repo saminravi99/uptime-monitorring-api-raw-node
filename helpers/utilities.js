@@ -70,7 +70,7 @@ utilities.parseRequest = (req) => {
 
 utilities.generateToken = (strLength) => {
   const possibleCharacters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   strLength =
     typeof strLength === "number" && strLength > 0 ? strLength : false;
   if (strLength) {
