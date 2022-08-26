@@ -12,11 +12,12 @@ handler.chosenHandler = (chosenRoute, requestedProperties, res) => {
     //validate payload if not valid then set to an empty object
     payload = typeof payload === "object" ? payload : {};
 
+    //method validator to validate the method
     if (methodValidator(requestedProperties.methodString)) {
       if (statusCode === 500) {
         res.setHeader("Content-Type", "application/json");
         res.writeHead(500);
-        res.end(JSON.stringify({ message: "Internal Server Error" }));
+        res.end(JSON.stringify(payload));
       } else {
         const payloadString = JSON.stringify(payload);
         res.setHeader("Content-Type", "application/json");

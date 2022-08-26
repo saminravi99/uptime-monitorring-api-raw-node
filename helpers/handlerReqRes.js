@@ -11,9 +11,11 @@ const helpers = {};
 
 //handler request and response
 helpers.handleReqRes = (req, res) => {
+
+  //utility function to parse the request
   const requestedProperties = parseRequest(req);
 
-  //choosing the routes
+  //choosing the routes from the routes.js file
   const chosenRoute =
     typeof routes[requestedProperties.trimmedPathName] !== "undefined"
       ? routes[requestedProperties.trimmedPathName]
@@ -29,12 +31,13 @@ helpers.handleReqRes = (req, res) => {
     .on("end", () => {
       realData += decoder.end();
 
-      //passing realData into requestedProperties object as payload
+      //passing realData into requestedProperties object as payload if method is post. So method needes to be valiadated
       methodHandler(requestedProperties, realData)
 
+      //after chosenRoute is selected, all the other necessary functions to do is handled by another utility function 
       chosenHandler(chosenRoute, requestedProperties, res);
     });
 };
 
 //export module
-module.exports = helpers;
+module.exports = helpers; 

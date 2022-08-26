@@ -1,9 +1,29 @@
 //dependecies
 const url = require("url");
 const { StringDecoder } = require("string_decoder");
+const crypto = require("crypto");
+const environment = require("./environment");
 
 //module scaffoliding
 const utilities = {};
+
+//hashPassword utility function
+utilities.hashPassword = (password) => {
+  const userPassword =
+    typeof password === "string" && password.trim().length > 0
+      ? password.trim()
+      : false;
+
+  if (userPassword) {
+    const hash = crypto
+      .createHmac("sha256", environment.secretKey)
+      .update(userPassword)
+      .digest("hex");
+    return hash;
+  } else {
+    return false;
+  }
+};
 
 //handler to parse the request
 utilities.parseRequest = (req) => {
@@ -44,10 +64,9 @@ utilities.parseRequest = (req) => {
     headersObject,
     methodString,
   };
-//   console.log(requestedProperties);
+  //   console.log(requestedProperties);
   return requestedProperties;
 };
-
 
 //export module
 module.exports = utilities;
